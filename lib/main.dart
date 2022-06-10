@@ -8,14 +8,12 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  final _pageTitle = 'Startup Name Generator';
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: _pageTitle,
+      title: 'Startup Name Generator',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepPurple,
       ),
       home: const RandomWords(),
     );
