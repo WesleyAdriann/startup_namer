@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 
@@ -15,18 +13,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: _pageTitle,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: Scaffold(
-          appBar: AppBar(
-            title: Text(_pageTitle),
-          ),
-          body: const Center(
-            child: RandomWords(),
-          ),
-        ));
+      title: _pageTitle,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const RandomWords(),
+    );
   }
 }
 
@@ -52,33 +44,74 @@ class _RandomWordsState extends State<RandomWords> {
     });
   }
 
+  void _pushToFavoriteList() {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => FavoriteWords(favorites: _favorites),
+    ));
+  }
+
   Widget _generateListItem(BuildContext context, int index) {
     if (index.isOdd) return const Divider();
-    if (index >= _suggestions.length) {
-      _generateMore();
-    }
+    if (index >= _suggestions.length) _generateMore();
+
     final word = _suggestions[index];
     final alreadyFavorited = _favorites.contains(word);
     return ListTile(
-        title: Text(
-          word.asPascalCase,
-          style: const TextStyle(fontSize: 18),
-        ),
-        trailing: Icon(
-          alreadyFavorited ? Icons.favorite : Icons.favorite_border,
-          color: alreadyFavorited ? Colors.red : null,
-          semanticLabel: alreadyFavorited ? 'Remove' : 'Save',
-        ),
-        onTap: () {
-          _handleTap(word, alreadyFavorited);
-        });
+      title: Text(
+        word.asPascalCase,
+        style: const TextStyle(fontSize: 18),
+      ),
+      trailing: Icon(
+        alreadyFavorited ? Icons.favorite : Icons.favorite_border,
+        color: alreadyFavorited ? Colors.red : null,
+        semanticLabel: alreadyFavorited ? 'Remove' : 'Save',
+      ),
+      onTap: () {
+        _handleTap(word, alreadyFavorited);
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemBuilder: _generateListItem,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Startup Name Generator'),
+        actions: [
+          IconButton(
+            onPressed: _pushToFavoriteList,
+            icon: const Icon(Icons.list),
+            tooltip: 'Favorite list',
+          )
+        ],
+      ),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemBuilder: _generateListItem,
+      ),
+    );
+  }
+}
+
+class FavoriteWords extends StatelessWidget {
+  const FavoriteWords({Key? key, required this.favorites}) : super(key: key);
+
+  final List<WordPair> favorites;
+
+  @override
+  Widget build(BuildContext context) {
+    final tiles = favorites.map(
+      (pair) => ListTile(
+          title: Text(pair.asPascalCase, style: const TextStyle(fontSize: 18))),
+    );
+    final divided = tiles.isNotEmpty
+        ? ListTile.divideTiles(context: context, tiles: tiles).toList()
+        : <Widget>[];
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Favorites'),
+      ),
+      body: ListView(children: divided),
     );
   }
 }
