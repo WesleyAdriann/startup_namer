@@ -37,26 +37,37 @@ class RandomWords extends StatefulWidget {
 
 class _RandomWordsState extends State<RandomWords> {
   final _suggestions = <WordPair>[];
+  final _favorites = <WordPair>[];
 
   void generateMore() {
     _suggestions.addAll(generateWordPairs().take(10));
+  }
+
+  Widget generateListItem(BuildContext context, int index) {
+    if (index.isOdd) return const Divider();
+    if (index >= _suggestions.length) {
+      generateMore();
+    }
+    final word = _suggestions[index];
+    final alreadyFavorited = _favorites.contains(word);
+    return ListTile(
+      title: Text(
+        word.asPascalCase,
+        style: const TextStyle(fontSize: 18),
+      ),
+      trailing: Icon(
+        alreadyFavorited ? Icons.favorite : Icons.favorite_border,
+        color: alreadyFavorited ? Colors.red : null,
+        semanticLabel: alreadyFavorited ? 'Remove' : 'Save',
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemBuilder: (context, index) {
-        if (index.isOdd) return const Divider();
-        if (index >= _suggestions.length) {
-          generateMore();
-        }
-        return ListTile(
-            title: Text(
-          _suggestions[index].asPascalCase,
-          style: const TextStyle(fontSize: 18),
-        ));
-      },
+      itemBuilder: generateListItem,
     );
   }
 }
