@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 
@@ -39,35 +41,44 @@ class _RandomWordsState extends State<RandomWords> {
   final _suggestions = <WordPair>[];
   final _favorites = <WordPair>[];
 
-  void generateMore() {
+  void _generateMore() {
     _suggestions.addAll(generateWordPairs().take(10));
   }
 
-  Widget generateListItem(BuildContext context, int index) {
+  void _handleTap(WordPair word, bool alreadyFavorited) {
+    final handler = alreadyFavorited ? _favorites.remove : _favorites.add;
+    setState(() {
+      handler(word);
+    });
+  }
+
+  Widget _generateListItem(BuildContext context, int index) {
     if (index.isOdd) return const Divider();
     if (index >= _suggestions.length) {
-      generateMore();
+      _generateMore();
     }
     final word = _suggestions[index];
     final alreadyFavorited = _favorites.contains(word);
     return ListTile(
-      title: Text(
-        word.asPascalCase,
-        style: const TextStyle(fontSize: 18),
-      ),
-      trailing: Icon(
-        alreadyFavorited ? Icons.favorite : Icons.favorite_border,
-        color: alreadyFavorited ? Colors.red : null,
-        semanticLabel: alreadyFavorited ? 'Remove' : 'Save',
-      ),
-    );
+        title: Text(
+          word.asPascalCase,
+          style: const TextStyle(fontSize: 18),
+        ),
+        trailing: Icon(
+          alreadyFavorited ? Icons.favorite : Icons.favorite_border,
+          color: alreadyFavorited ? Colors.red : null,
+          semanticLabel: alreadyFavorited ? 'Remove' : 'Save',
+        ),
+        onTap: () {
+          _handleTap(word, alreadyFavorited);
+        });
   }
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemBuilder: generateListItem,
+      itemBuilder: _generateListItem,
     );
   }
 }
