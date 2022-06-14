@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 
-class FavoriteWords extends StatelessWidget {
-  const FavoriteWords({Key? key, required this.favorites}) : super(key: key);
+class MyFavoriteWordsPage extends StatelessWidget {
+  const MyFavoriteWordsPage({Key? key, required this.favorites})
+      : super(key: key);
 
   final List<WordPair> favorites;
 
@@ -10,7 +11,11 @@ class FavoriteWords extends StatelessWidget {
   Widget build(BuildContext context) {
     final tiles = favorites.map(
       (pair) => ListTile(
-          title: Text(pair.asPascalCase, style: const TextStyle(fontSize: 18))),
+        title: Text(
+          pair.asPascalCase,
+          style: const TextStyle(fontSize: 18),
+        ),
+      ),
     );
     final divided = tiles.isNotEmpty
         ? ListTile.divideTiles(context: context, tiles: tiles).toList()
